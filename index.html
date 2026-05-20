@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Busan Trip 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f0f4fa;
+    --card: #ffffff;
+    --black: #0d1b2a;
+    --mid: #4a5568;
+    --light: #9aa5b4;
+    --border: #d6e0ef;
+    --accent: #1a56db;
+    --accent-light: #ebf2ff;
+    --accent-mid: #bfd3f9;
+    --green: #1a7a4a;
+    --green-bg: #eaf5ef;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--black);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    max-width: 480px;
+    margin: 0 auto;
+    padding-bottom: 60px;
+  }
+
+  /* HEADER */
+  .trip-header {
+    background: var(--black);
+    color: white;
+    padding: 44px 24px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .trip-header::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(26,86,219,0.35) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .trip-header .eyebrow {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #6da0ff;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .trip-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.15;
+  }
+  .trip-header .meta {
+    margin-top: 10px;
+    font-size: 12px;
+    font-weight: 300;
+    color: #8a9bb5;
+    letter-spacing: 0.5px;
+  }
+  .header-badges {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+  .header-badge {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.4);
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  /* STICKY NAV */
+  .date-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: white;
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding: 0 12px;
+    gap: 2px;
+    box-shadow: 0 2px 8px rgba(26,86,219,0.08);
+  }
+  .date-nav::-webkit-scrollbar { display: none; }
+  .date-nav a {
+    color: var(--mid);
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 13px 10px;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.15s;
+  }
+  .date-nav a.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  /* DAY SECTION */
+  .day-section { padding: 0 16px; }
+
+  .day-header {
+    padding: 28px 0 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .day-num {
+    background: var(--accent);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-top: 4px;
+    white-space: nowrap;
+  }
+  .day-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .day-sub {
+    font-size: 12px;
+    color: var(--mid);
+    font-weight: 400;
+    margin-top: 2px;
+  }
+
+  /* CITY BADGE */
+  .city-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 12px 5px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: var(--mid);
+    margin-bottom: 14px;
+  }
+  .city-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  /* EVENT CARD */
+  .event-card {
+    background: var(--card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+    margin-bottom: 8px;
+  }
+  .event-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .event-time {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+    margin-bottom: 3px;
+  }
+  .event-name {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--black);
+  }
+  .event-detail {
+    font-size: 12px;
+    color: var(--mid);
+    font-weight: 400;
+    margin-top: 3px;
+    line-height: 1.5;
+  }
+  .event-note {
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 600;
+    margin-top: 8px;
+    background: var(--accent-light);
+    padding: 6px 10px;
+    border-radius: 6px;
+    border-left: 3px solid var(--accent);
+    line-height: 1.5;
+  }
+  .event-note.warn {
+    color: #c05000;
+    background: #fff4eb;
+    border-left-color: #e07020;
+  }
+  .tags { display: flex; flex-wrap: wrap; gap: 5px; flex-shrink: 0; }
+
+  /* TAGS */
+  .tag {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    text-transform: uppercase;
+  }
+  .tag-flight { background: var(--accent-light); color: var(--accent); border: 1px solid var(--accent-mid); }
+  .tag-food { background: #fff4eb; color: #c05000; border: 1px solid #fcd9b0; }
+  .tag-spot { background: var(--green-bg); color: var(--green); border: 1px solid #b5e0c8; }
+
+  /* COPY BUTTONS */
+  .event-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--mid);
+    border-radius: 6px;
+    padding: 6px 11px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+    -webkit-appearance: none;
+  }
+  .copy-btn:active { transform: scale(0.97); }
+  .copy-btn svg { width: 11px; height: 11px; flex-shrink: 0; }
+
+  /* INFO CARD */
+  .info-card {
+    background: var(--card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+  .info-card-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--mid);
+    padding: 12px 16px 10px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    gap: 10px;
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-label { font-size: 11px; color: var(--light); font-weight: 500; white-space: nowrap; flex-shrink: 0; }
+  .info-value { font-size: 13px; font-weight: 600; color: var(--black); text-align: right; }
+
+  /* HOTEL CARD */
+  .hotel-card {
+    background: #f0f5ff;
+    border: 1.5px solid var(--accent-mid);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .hotel-icon { font-size: 22px; flex-shrink: 0; line-height: 1; }
+  .hotel-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 3px;
+  }
+  .hotel-name { font-size: 13px; font-weight: 600; line-height: 1.3; color: var(--black); }
+  .hotel-sub { font-size: 11px; color: var(--mid); font-weight: 400; margin-top: 2px; }
+  .hotel-actions { margin-left: auto; flex-shrink: 0; }
+  .hotel-actions .copy-btn { background: white; border-color: var(--accent-mid); color: var(--accent); }
+
+  /* TRANSPORT */
+  .transport-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 4px;
+    margin-bottom: 8px;
+    color: var(--light);
+    font-size: 12px;
+  }
+  .transport-row .arr {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
+    color: var(--mid);
+  }
+
+  /* MODAL */
+  .copy-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: rgba(0,0,0,0.45);
+    align-items: flex-end;
+  }
+  .copy-modal.show { display: flex; }
+  .modal-inner {
+    background: white;
+    width: 100%;
+    border-radius: 20px 20px 0 0;
+    padding: 24px 20px 44px;
+  }
+  .modal-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--light);
+    margin-bottom: 8px;
+  }
+  .modal-text {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--black);
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 14px 16px;
+    word-break: break-all;
+    margin-bottom: 8px;
+    border: 1px solid var(--border);
+    cursor: text;
+    user-select: all;
+    -webkit-user-select: all;
+    line-height: 1.4;
+  }
+  .modal-hint { font-size: 11px; color: var(--light); text-align: center; margin-bottom: 16px; }
+  .modal-hint.success { color: var(--green); font-weight: 600; }
+  .modal-btns-top { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .modal-btns { display: grid; grid-template-columns: 1fr; gap: 10px; }
+  .mbtn {
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+  }
+  .mbtn-copy { background: var(--accent); color: white; }
+  .mbtn-copy.done { background: var(--green); }
+  .mbtn-close { background: var(--bg); color: var(--mid); border: 1px solid var(--border); }
+  .mbtn-map { background: var(--black); color: white; }
+
+  /* FLIGHT SUMMARY */
+  .flight-summary {
+    background: var(--black);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 8px;
+    color: white;
+  }
+  .flight-summary-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #6da0ff;
+    margin-bottom: 10px;
+  }
+  .flight-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .flight-row:last-child { margin-bottom: 0; }
+  .flight-person {
+    font-size: 10px;
+    font-weight: 700;
+    background: rgba(26,86,219,0.3);
+    color: #9ac0ff;
+    padding: 2px 7px;
+    border-radius: 4px;
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+  }
+  .flight-info { font-size: 12px; color: #cdd8eb; }
+  .flight-time { font-size: 13px; font-weight: 600; color: white; }
+</style>
+</head>
+<body>
+
+<div class="trip-header">
+  <div class="eyebrow">Travel Itinerary</div>
+  <h1>Busan<br>2026</h1>
+  <div class="meta">Jul 17 – Jul 20 · スミ & センダン</div>
+
+</div>
+
+<nav class="date-nav" id="dateNav">
+  <a href="#d17" data-target="d17">7/17 金</a>
+  <a href="#d18" data-target="d18">7/18 土</a>
+  <a href="#d19" data-target="d19">7/19 日</a>
+  <a href="#d20" data-target="d20">7/20 月</a>
+</nav>
+
+<!-- DAY 1 -->
+<section class="day-section" id="d17">
+  <div class="day-header">
+    <div class="day-num">Day 1</div>
+    <div>
+      <div class="day-title">7月17日（金）</div>
+      <div class="day-sub">移動日 → 釜山着・夜は西面へ</div>
+    </div>
+  </div>
+  <div class="flight-summary">
+    <div class="flight-summary-label">フライト情報</div>
+    <div class="flight-row">
+      <span class="flight-person">スミ</span>
+      <div>
+        <div class="flight-info">NRT → PUS · BX111</div>
+        <div class="flight-time">10:55 → 13:15</div>
+      </div>
+    </div>
+    <div class="flight-row">
+      <span class="flight-person">センダン</span>
+      <div>
+        <div class="flight-info">KIX → PUS · BX123</div>
+        <div class="flight-time">11:00 → 12:40</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="event-note" style="margin-bottom:8px; border-radius:8px; padding:10px 12px; background:#ebf2ff; border-left:3px solid #1a56db; font-size:11px; color:#1a3a8a; font-weight:600;">
+    🛬 センダンが先着（12:40）→ スミ到着（13:15）まで到着ロビーで待ち合わせ
+  </div>
+
+  <div class="event-card">
+    <div class="event-top">
+      <div>
+        <div class="event-time">13:15〜 集合後</div>
+        <div class="event-name">空港 → ホテルへ移動</div>
+        <div class="event-detail">金海国際空港から市内へ · 地下鉄（空港線）が便利 · 西面・海雲台方面へ約40〜60分</div>
+      </div>
+    </div>
+    <div class="event-actions">
+      <button class="copy-btn" onclick="openCopy('金海国際空港 住所', '김해국제공항, 공항진입로 108, 강서구, 부산')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        空港 住所
+      </button>
+    </div>
+  </div>
+
+  <div class="hotel-card">
+    <div class="hotel-icon">🏨</div>
+    <div>
+      <div class="hotel-label">チェックイン · 7/17〜7/20</div>
+      <div class="hotel-name">ホテル（要予約）</div>
+      <div class="hotel-sub">西面 or 海雲台エリアがおすすめ</div>
+    </div>
+  </div>
+
+  <div class="transport-row"><span class="arr">↓</span>荷物を置いて夜の街へ</div>
+
+  <div class="event-card">
+    <div class="event-top">
+      <div>
+        <div class="event-time">夜</div>
+        <div class="event-name">西面（ソミョン）エリアで夕食</div>
+        <div class="event-detail">釜山最大の繁華街 · 屋台・焼肉・チムタク・豚国など選択肢多数</div>
+      </div>
+      <div class="tags"><span class="tag tag-food">🍖 夕食</span></div>
+    </div>
+    <div class="event-actions">
+      <button class="copy-btn" onclick="openCopy('서면 먹자골목 住所', '서면 먹자골목, 부전동, 부산진구, 부산')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        西面グルメ通り
+      </button>
+    </div>
+  </div>
+
+  <div class="event-card">
+    <div class="event-top">
+      <div>
+        <div class="event-name">돼지국밥（豚骨スープ）</div>
+        <div class="event-detail">釜山名物 · 〆のスープに最高 · 24時間営業の店も多い</div>
+      </div>
+      <div class="tags"><span class="tag tag-food">🍜 名物</span></div>
+    </div>
+    <div class="event-actions">
+      <button class="copy-btn" onclick="openCopy('쌍둥이 돼지국밥 住所', '쌍둥이돼지국밥, 부전동 복개로 지하상가 부근, 부산')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        쌍둥이 돼지국밥
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- DAY 2 -->
+<section class="day-section" id="d18">
+  <div class="day-header">
+    <div class="day-num">Day 2</div>
+    <div>
+      <div class="day-title">7月18日（土）</div>
+      <div class="day-sub">甘川文化村 · 松島ビーチ · 夜市</div>
+    </div>
+  </div>
+
+  <div class="event-card">
+    <div class="event-top">
+      <div>
+        <div class="event-time">9:00〜 朝食</div>
+        <div class="event-name">近くのカフェやコンビニで朝ごはん</div>
+        <div class="event-detail">韓国のCUやGS25のサンドイッチ・おにぎりが美味しい</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="transport-row"><span class="arr">↓</span>タクシーまたはバスで約30〜40分</div>
+
+  <div class="event-card">
+    <div class="event-top">
+      <div>
+        <div class="event-time">10:30〜</div>
+        <div class="event-name">甘川文化村（감천문화마을）</div>
+        <div class="event-detail">「釜山のマチュピチュ」· 坂の街に色とりどりの家 · フォトジェニック · 早めに行くと人少なめ</div>
+      </div>
+      <div class="tags"><span class="tag tag-spot">📸 観光</span></div>
+    </div>
+    <div class="event-note">💡 地図を買うと隠れキャラを探しながら回れる（100円くらい）</div>
+    <div class="event-actions">
+      <button class="copy-btn" onclick="openCopy('甘川文化村 住所', '감천문화마을, 감내2로 203, 사하구, 부산')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        住所コピー
+      </button>
+    </div>
+  </div>
+
+  <div class="transport-row"><span class="arr">↓</span>タクシーで約15分</div>
+
+  <div class="event-card">
+    <div class="event-top">
+      <div>
+        <div class="event-time">13:00〜 ランチ</div>
+        <div class="event-name">チャガルチ市場 周辺でシーフード</div>
+        <div class="event-detail">釜山最大の魚市場 · 2階の食堂で刺身定食 · 新鮮なタコ・エビ・貝類</div>
+      </div>
+      <div class="tags"><span class="tag tag-food">🐟 昼食</span></div>
+    </div>
+    <div class="event-actions">
+      <button class="copy-btn" onclick="openCopy('자갈치시장 住所', '자갈치시장, 자갈치해안로 52, 남구, 부산')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        チャガルチ市場
+      </button>
+    </div>
+  </div>
+
+  <div class="transport-row"><span class="arr">↓</span>タクシーで約15分</div>
+
+  <div class="event-card">
+    <div class="event-top">
+      <div>
+        <div class="event-time">15:00〜</div>
+        <div class="event-name">松島（송도）ビーチ散歩</div>
+        <div class="event-detail">釜山最古のビーチ · 松島スカイウォーク（海上遊歩道）が絶景 · 夕方は特にきれい</div>
+      </div>
+      <div class="tags"><span class="tag tag-spot">🌊 スポット</span></div>
+    </div>
+    <div class="event-actions">
+      <button class="copy-btn" onclick="openCopy('송도해수욕장 住所', '송도해수욕장, 암남동, 서구, 부산')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        松島ビーチ
+      </button>
+      <button class="copy-btn" onclick="openCopy('송도 스카이워크 住所', '송도용궁구름다리, 암남공원로 181, 서구, 부산')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        スカイウォーク
+      </button>
+    </div>
+  </div>
+
+  <div class="transport-row"><span class="arr">↓</span>タクシーで影島へ · 約10分</div>
+
+  <div class="event-card">
+    <div class="event-top">
+      <div>
+        <div class="event-time">17:00〜</div>
+        <div class="event-name">Thrill On The Mug ☕</div>
+        <div class="event-detail">影島の崖上に建つ展望カフェ · 海と釜山の街並みが一望できる絶景 · 夕方の光が特にきれい</div>
+      </div>
+      <div class="tags"><span class="tag tag-spot">📸 絶景</span></div>
+    </div>
+    <div class="event-actions">
+      <button class="copy-btn" onclick="openCopy('Thrill On The Mug 住所', 'Thrill On The Mug, 영도구 절영로 195, 부산')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        住所コピー
+      </button>
+    </div>
+  </div>
+
+  <div class="transport-row"><span class="arr">↓</span>タクシーで南浦洞へ · 約15〜20分 · 土曜18:30頃は影島大橋周辺が渋滞しやすい → 18:30前にカフェを出ると安心</div>
+
+  <div class="event-card">
+    <div class="event-top">
+      <div>
+        <div class="event-time">19:00〜</div>
+        <div class="event-name">BIFF広場 夜市</div>
+        <div class="event-detail">釜山国際映画祭の会場 · 屋台グルメ通り · 씨앗호떡（シアホットク）が有名</div>
+      </div>
+      <div class="tags"><span class="tag tag-food">🥞 夜食</span></div>
+    </div>
+    <div class="event-actions">
+      <button class="copy-btn" onclick="openCopy('BIFF광장 住所', 'BIFF광장, 남포동 5가, 중구, 부산')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        BIFF広場
+      </button>
+    </div>
+  </div>
+
+  <div class="transport-row"><span class="arr">↓</span>タクシーで海雲台へ · 釜山西端→東端の大移動 · 混雑なしで約40〜50分、混んでると1時間近く · カジノは24h営業なので焦らずOK</div>
+
+  <div class="event-card">
+    <div class="event-top">
+      <div>
+        <div class="event-time">22:00〜</div>
+        <div class="event-name">🎰 パラダイスカジノ 釜山</div>
+        <div class="event-detail">海雲台ロッテホテル内 · 外国人専用 · 24時間営業 · スロット・バカラ・ブラックジャックなど</div>
+      </div>
+    </div>
+    <div class="event-note warn">⚠ パスポート必携！忘れると入れない · 服装はスマートカジュアル推奨</div>
+    <div class="event-actions">
+      <button class="copy-btn" onclick="openCopy('パラダイスカジノ 釜山 住所', '파라다이스 카지노 부산, 해운대해변로 298-25, 해운대구, 부산')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        住所コピー
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- DAY 3 -->
+<section class="day-section" id="d19">
+  <div class="day-header">
+    <div class="day-num">Day 3</div>
+    <div>
+      <div class="day-title">7月19日（日）</div>
+      <div class="day-sub">海雲台ビーチ · 広安里 · ショッピング</div>
+    </div>
+  </div>
+
+  <div class="event-card">
+    <div class="event-top">
+      <div>
+        <div class="event-time">9:00〜</div>
+        <div class="event-name">朝のカフェ散歩</div>
+        <div class="event-detail">海雲台エリアはおしゃれカフェが多い · 海が見えるテラス席狙い</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="event-card">
+    <div class="event-top">
+      <div>
+        <div class="event-time">10:00〜</div>
+        <div class="event-name">海雲台（해운대）ビーチ</div>
+        <div class="event-detail">韓国屈指のビーチリゾート · 夏は激混み · 早朝〜午前中がベスト · 海水浴もOK</div>
+      </div>
+      <div class="tags"><span class="tag tag-spot">🏖 ビーチ</span></div>
+    </div>
+    <div class="event-actions">
+      <button class="copy-btn" onclick="openCopy('해운대해수욕장 住所', '해운대해수욕장, 해운대해변로 264, 해운대구, 부산')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        海雲台ビーチ
+      </button>
+    </div>
+  </div>
+
+  <div class="event-card">
+    <div class="event-top">
+      <div>
+        <div class="event-time">13:00〜 ランチ</div>
+        <div class="event-name">밀면（ミルミョン）</div>
+        <div class="event-detail">釜山発祥の冷麺 · 夏にぴったり · 냉면より甘め · 海雲台ビーチ近くの「해운대 밀면」がおすすめ · ※ 암소갈비집は高級焼肉店なので別物注意</div>
+      </div>
+      <div class="tags"><span class="tag tag-food">🍜 名物</span></div>
+    </div>
+  </div>
+
+  <div class="transport-row"><span class="arr">↓</span>海沿いを歩いて or タクシーで10分</div>
+
+  <div class="event-card">
+    <div class="event-top">
+      <div>
+        <div class="event-time">15:00〜</div>
+        <div class="event-name">広安里（광안리）ビーチ & 広安大橋</div>
+        <div class="event-detail">広安大橋の夜景が絶景 · 海雲台より落ち着いた雰囲気 · おしゃれなカフェ多め</div>
+      </div>
+      <div class="tags"><span class="tag tag-spot">🌉 景色</span></div>
+    </div>
+    <div class="event-actions">
+      <button class="copy-btn" onclick="openCopy('광안리해수욕장 住所', '광안리해수욕장, 광안해변로 219, 수영구, 부산')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        広安里ビーチ
+      </button>
+    </div>
+  </div>
+
+  <div class="event-card">
+    <div class="event-top">
+      <div>
+        <div class="event-time">17:00〜 ショッピング</div>
+        <div class="event-name">서면 롯데백화점 / ABC마트 / OLIVE YOUNG</div>
+        <div class="event-detail">オリーブヤング（韓国コスメ）は必須 · 西面ロッテ百貨店周辺に集中 · 免税品もあり</div>
+      </div>
+    </div>
+    <div class="event-actions">
+      <button class="copy-btn" onclick="openCopy('올리브영 서면점 住所', '올리브영 서면점, 서면로 68, 부산진구, 부산')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        OLIVE YOUNG 西面
+      </button>
+    </div>
+  </div>
+
+  <div class="event-card">
+    <div class="event-top">
+      <div>
+        <div class="event-time">20:00〜 夕食</div>
+        <div class="event-name">삼겹살（サムギョプサル）</div>
+        <div class="event-detail">豚バラを炭火で · 旅の締めにぴったり · 소주（ソジュ）と一緒に · 西面の焼肉通りへ</div>
+      </div>
+      <div class="tags"><span class="tag tag-food">🥩 夕食</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- DAY 4 -->
+<section class="day-section" id="d20">
+  <div class="day-header">
+    <div class="day-num">Day 4</div>
+    <div>
+      <div class="day-title">7月20日（月）</div>
+      <div class="day-sub">帰国日 · 午前チェックアウト</div>
+    </div>
+  </div>
+
+  <div class="event-note warn" style="margin-bottom:12px; border-radius:8px; padding:10px 12px;">
+    ⚠ スミは5:20にはホテルを出ること！寝坊厳禁 · センダンは6:30出発でOK · 荷造りは前夜に済ませておく
+  </div>
+
+  <div class="flight-summary">
+    <div class="flight-summary-label">帰国フライト</div>
+    <div class="flight-row">
+      <span class="flight-person">センダン</span>
+      <div>
+        <div class="flight-info">PUS → KIX · BX124</div>
+        <div class="flight-time">08:30 → 10:05</div>
+      </div>
+    </div>
+    <div class="flight-row">
+      <span class="flight-person">スミ</span>
+      <div>
+        <div class="flight-info">PUS → NRT · BX112</div>
+        <div class="flight-time">07:50 → 10:00</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="event-card">
+    <div class="event-top">
+      <div>
+        <div class="event-time">5:20 ホテル出発</div>
+        <div class="event-name">空港へ移動・現地解散</div>
+        <div class="event-detail">スミは7:50発 → 5:50空港着が目標 → ホテルを5:20出発でタクシー · センダンは8:30発なので6:30出発でOK</div>
+      </div>
+    </div>
+    <div class="event-actions">
+      <button class="copy-btn" onclick="openCopy('金海国際空港 住所', '김해국제공항, 공항진입로 108, 강서구, 부산')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        空港 住所
+      </button>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-title">各自フライト情報</div>
+    <div class="info-row"><span class="info-label">スミ</span><span class="info-value">BX112 · 07:50発 · NRT着</span></div>
+    <div class="info-row"><span class="info-label">センダン</span><span class="info-value">BX124 · 08:30発 · KIX着</span></div>
+    <div class="info-row"><span class="info-label">空港到着</span><span class="info-value">2時間前推奨</span></div>
+  </div>
+
+  <div class="event-card">
+    <div class="event-name">空港内で最後の韓国グルメ</div>
+    <div class="event-detail" style="margin-top:3px">김밥（キンパ）· カフェ · お土産の最終チェック</div>
+  </div>
+</section>
+
+<!-- COPY MODAL -->
+<div class="copy-modal" id="copyModal" onclick="bgClose(event)">
+  <div class="modal-inner">
+    <div class="modal-label" id="modalLabel">住所</div>
+    <div class="modal-text" id="modalText" onclick="selectAll()"></div>
+    <div class="modal-hint" id="modalHint">テキストをタップで全選択できます</div>
+    <div class="modal-btns-top">
+      <button class="mbtn mbtn-copy" id="copyBtnMain" onclick="doCopy()">コピー</button>
+      <button class="mbtn mbtn-map" onclick="doOpenMap()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" width="14" height="14" style="margin-right:4px;vertical-align:middle"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>マップ
+      </button>
+    </div>
+    <div class="modal-btns">
+      <button class="mbtn mbtn-close" onclick="closeModal()">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  var currentText = '';
+
+  var navLinks = document.querySelectorAll('#dateNav a');
+  var sections = ['d17','d18','d19','d20'].map(function(id){ return document.getElementById(id); });
+
+  navLinks.forEach(function(link) {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      var target = document.getElementById(this.getAttribute('data-target'));
+      if (!target) return;
+      var navH = document.getElementById('dateNav').offsetHeight;
+      var y = target.getBoundingClientRect().top + window.pageYOffset - navH;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    });
+  });
+
+  function setActive(id) {
+    navLinks.forEach(function(l) {
+      l.classList.toggle('active', l.getAttribute('data-target') === id);
+    });
+    var activeLink = document.querySelector('#dateNav a.active');
+    if (activeLink) activeLink.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+  }
+
+  var navHeight = document.getElementById('dateNav').offsetHeight;
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) setActive(entry.target.id);
+    });
+  }, { rootMargin: '-' + navHeight + 'px 0px -60% 0px', threshold: 0 });
+  sections.forEach(function(s){ if(s) observer.observe(s); });
+  setActive('d17');
+
+  function openCopy(label, text) {
+    currentText = text;
+    document.getElementById('modalLabel').textContent = label;
+    document.getElementById('modalText').textContent = text;
+    document.getElementById('modalHint').textContent = 'テキストをタップで全選択できます';
+    document.getElementById('modalHint').className = 'modal-hint';
+    var btn = document.getElementById('copyBtnMain');
+    btn.textContent = 'コピー';
+    btn.className = 'mbtn mbtn-copy';
+    document.getElementById('copyModal').classList.add('show');
+  }
+
+  function closeModal() { document.getElementById('copyModal').classList.remove('show'); }
+  function bgClose(e) { if (e.target === document.getElementById('copyModal')) closeModal(); }
+
+  function selectAll() {
+    var el = document.getElementById('modalText');
+    var range = document.createRange();
+    range.selectNodeContents(el);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  function doOpenMap() {
+    if (!currentText) return;
+    window.open('https://maps.google.com/?q=' + encodeURIComponent(currentText), '_blank');
+  }
+
+  function doCopy() {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(currentText).then(showSuccess).catch(fallbackCopy);
+    } else { fallbackCopy(); }
+  }
+
+  function fallbackCopy() {
+    selectAll();
+    try {
+      var ok = document.execCommand('copy');
+      if (ok) showSuccess(); else showManual();
+    } catch(e) { showManual(); }
+  }
+
+  function showSuccess() {
+    var btn = document.getElementById('copyBtnMain');
+    btn.textContent = '✓ コピーしました！';
+    btn.className = 'mbtn mbtn-copy done';
+    document.getElementById('modalHint').textContent = 'クリップボードにコピーされました';
+    document.getElementById('modalHint').className = 'modal-hint success';
+    setTimeout(closeModal, 1400);
+  }
+
+  function showManual() {
+    selectAll();
+    document.getElementById('modalHint').textContent = '↑ 長押し → コピーしてください';
+  }
+</script>
+</body>
+</html>
