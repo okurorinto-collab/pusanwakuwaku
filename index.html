@@ -36,39 +36,60 @@
   .trip-header {
     background: var(--black);
     color: white;
-    padding: 44px 24px 28px;
+    padding: 48px 24px 30px;
     position: relative;
     overflow: hidden;
   }
   .trip-header::before {
     content: '';
     position: absolute;
-    top: -40px; right: -40px;
-    width: 200px; height: 200px;
+    top: -60px; right: -60px;
+    width: 280px; height: 280px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(26,86,219,0.35) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(26,86,219,0.22) 0%, transparent 65%);
     pointer-events: none;
   }
   .trip-header .eyebrow {
-    font-size: 10px;
-    letter-spacing: 3px;
+    font-size: 9px;
+    letter-spacing: 4px;
     text-transform: uppercase;
-    color: #6da0ff;
-    font-weight: 600;
-    margin-bottom: 8px;
+    color: rgba(255,255,255,0.28);
+    font-weight: 500;
+    margin-bottom: 14px;
   }
   .trip-header h1 {
     font-family: 'Playfair Display', serif;
-    font-size: 32px;
+    font-size: 56px;
     font-weight: 700;
-    line-height: 1.15;
+    line-height: 1.0;
+    letter-spacing: -1.5px;
   }
-  .trip-header .meta {
-    margin-top: 10px;
+  .trip-header .year {
+    font-family: 'DM Sans', sans-serif;
     font-size: 12px;
     font-weight: 300;
-    color: #8a9bb5;
-    letter-spacing: 0.5px;
+    color: rgba(255,255,255,0.32);
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    margin-top: 6px;
+    margin-bottom: 18px;
+  }
+  .trip-header .header-rule {
+    width: 28px;
+    height: 1.5px;
+    background: #3b6fd4;
+    margin-bottom: 14px;
+    border-radius: 2px;
+  }
+  .trip-header .meta {
+    font-size: 12px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.42);
+    letter-spacing: 0.3px;
+  }
+  .trip-header .meta .names {
+    color: rgba(255,255,255,0.75);
+    font-weight: 500;
   }
   .header-badges {
     display: flex;
@@ -490,9 +511,10 @@
 
 <div class="trip-header">
   <div class="eyebrow">Travel Itinerary</div>
-  <h1>Busan<br>2026</h1>
-  <div class="meta">Jul 17 – Jul 20 · スミ & センダン</div>
-
+  <h1>Busan</h1>
+  <div class="year">2 0 2 6</div>
+  <div class="header-rule"></div>
+  <div class="meta"><span class="names">スミ & センダン</span> &nbsp;·&nbsp; Jul 17 – Jul 20</div>
 </div>
 
 <nav class="date-nav" id="dateNav">
@@ -1159,7 +1181,7 @@
     <path d="M2 13h20"/>
     <circle cx="12" cy="17" r="1.2" fill="currentColor" stroke="none"/>
   </svg>
-  割り勘チェック
+  割りマネー
 </a>
 
 </body>
