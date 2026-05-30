@@ -443,6 +443,38 @@
   }
   .flight-info { font-size: 12px; color: #cdd8eb; }
   .flight-time { font-size: 13px; font-weight: 600; color: white; }
+  /* WALICA FIXED BUTTON */
+  .walica-fab {
+    position: fixed;
+    bottom: 24px;
+    right: 16px;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--black);
+    color: white;
+    text-decoration: none;
+    padding: 12px 18px 12px 14px;
+    border-radius: 100px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    box-shadow: 0 4px 20px rgba(13,27,42,0.35);
+    transition: transform 0.15s, box-shadow 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .walica-fab:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 10px rgba(13,27,42,0.25);
+  }
+  .walica-fab svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
   /* SPOT PHOTO */
   .event-img {
     width: calc(100% + 32px);
@@ -1113,5 +1145,16 @@
     document.getElementById('modalHint').textContent = '↑ 長押し → コピーしてください';
   }
 </script>
+
+<a href="https://walica.jp/group/01KSVGTX6WH29KPB5NDNNV4JWT" target="_blank" class="walica-fab">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2" y="7" width="20" height="14" rx="2"/>
+    <path d="M16 7V5a2 2 0 00-4 0v2"/>
+    <path d="M2 13h20"/>
+    <circle cx="12" cy="17" r="1.2" fill="currentColor" stroke="none"/>
+  </svg>
+  割り勘チェック
+</a>
+
 </body>
 </html>
