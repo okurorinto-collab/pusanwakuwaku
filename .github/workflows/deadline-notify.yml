@@ -1,0 +1,22 @@
+name: タスク締切通知 (Discord)
+
+on:
+  schedule:
+    - cron: '0 0 * * *'   # 毎日 09:00 JST (UTC 00:00)
+  workflow_dispatch:        # 手動実行も可能
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Python dependencies
+        run: pip install google-cloud-firestore
+
+      - name: Run deadline check & notify
+        env:
+          FIREBASE_PROJECT_ID:      ${{ secrets.FIREBASE_PROJECT_ID }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          DISCORD_WEBHOOK_URL:      ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: python3 scripts/notify.py

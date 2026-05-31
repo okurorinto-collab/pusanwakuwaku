@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>タスカル！</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#ECEEFF; --white:#fff; --primary:#3730E8; --purple:#7B61FF;
+  --text:#1A1A2E; --mid:#4A4A6A; --light:#9090B0; --border:#D8D8F0;
+  --danger:#E83730; --success:#10B981; --warn:#F59E0B;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Noto Sans JP',sans-serif;font-size:14px;
+  min-height:100vh;max-width:480px;margin:0 auto;
+}
+
+/* ---- Views ---- */
+.view{display:none;min-height:100vh}
+.view.active{display:block}
+
+/* ---- Setup ---- */
+.setup-wrap{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;min-height:100vh;padding:40px 24px;
+}
+.setup-logo{font-size:52px;margin-bottom:12px}
+.setup-title{font-size:24px;font-weight:900;color:var(--primary);margin-bottom:8px;text-align:center}
+.setup-sub{font-size:13px;color:var(--mid);text-align:center;margin-bottom:28px;line-height:1.7}
+.setup-hint{margin-top:16px;font-size:11px;color:var(--light);text-align:center;line-height:1.8}
+.setup-hint a{color:var(--primary)}
+
+/* ---- Forms ---- */
+.form-group{width:100%;margin-bottom:14px}
+.form-label{font-size:11px;font-weight:700;color:var(--mid);margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:.5px}
+.form-input{
+  width:100%;padding:12px 14px;border:2px solid var(--border);
+  border-radius:12px;font-size:14px;font-family:inherit;
+  background:white;color:var(--text);outline:none;transition:border-color .2s;
+}
+.form-input:focus{border-color:var(--primary)}
+textarea.form-input{min-height:72px;resize:vertical}
+
+/* ---- Buttons ---- */
+.btn-primary{
+  width:100%;padding:14px;
+  background:linear-gradient(135deg,var(--primary) 0%,var(--purple) 100%);
+  color:white;border:none;border-radius:14px;
+  font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;transition:opacity .2s;
+}
+.btn-primary:active{opacity:.8}
+.btn-secondary{
+  padding:10px 18px;background:white;color:var(--primary);
+  border:2px solid var(--primary);border-radius:10px;
+  font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;
+}
+.btn-danger{
+  padding:10px 18px;background:white;color:var(--danger);
+  border:2px solid var(--danger);border-radius:10px;
+  font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;
+}
+.btn-icon{background:none;border:none;cursor:pointer;padding:8px;border-radius:8px;font-size:18px;line-height:1}
+
+/* ---- Header ---- */
+.app-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;background:var(--bg);position:sticky;top:0;z-index:50;
+}
+.app-logo{font-size:18px;font-weight:900;color:var(--primary);display:flex;align-items:center;gap:6px}
+
+/* ---- Tabs ---- */
+.tabs{
+  display:flex;gap:8px;padding:0 20px 14px;
+  overflow-x:auto;scrollbar-width:none;
+}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  flex-shrink:0;padding:7px 14px;border-radius:50px;
+  font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;
+  border:none;background:white;color:var(--mid);transition:all .2s;
+}
+.tab.active{background:var(--primary);color:white}
+
+/* ---- Task list ---- */
+.task-list{padding:0 20px 120px;display:flex;flex-direction:column;gap:10px}
+.task-card{
+  background:white;border-radius:16px;padding:14px 16px;
+  box-shadow:0 2px 10px rgba(55,48,232,.06);cursor:pointer;transition:transform .15s;
+}
+.task-card:active{transform:scale(.98)}
+.task-card.done{opacity:.45}
+.task-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px}
+.task-check{
+  width:22px;height:22px;border-radius:6px;border:2px solid var(--border);
+  flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:12px;margin-top:1px;transition:all .15s;
+}
+.task-check.done{background:var(--success);border-color:var(--success);color:white}
+.task-title{font-size:15px;font-weight:700;color:var(--text);flex:1;line-height:1.4}
+.task-card.done .task-title{text-decoration:line-through;color:var(--light)}
+.task-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.task-folder{
+  font-size:11px;font-weight:700;padding:2px 9px;
+  border-radius:50px;background:var(--bg);color:var(--primary);
+}
+.task-dl{font-size:12px;color:var(--light)}
+.task-dl.urgent{color:var(--danger);font-weight:700}
+.task-dl.soon{color:var(--warn);font-weight:700}
+
+/* ---- Empty ---- */
+.empty{text-align:center;padding:60px 20px;color:var(--light)}
+.empty .icon{font-size:48px;margin-bottom:10px}
+
+/* ---- FAB wrapper ---- */
+.fab-wrap{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:480px;display:flex;justify-content:flex-end;
+  padding:0 24px 28px;pointer-events:none;
+}
+.fab{
+  pointer-events:all;width:56px;height:56px;
+  background:linear-gradient(135deg,var(--primary),var(--purple));
+  color:white;border:none;border-radius:16px;font-size:26px;
+  cursor:pointer;box-shadow:0 4px 20px rgba(55,48,232,.4);
+  display:flex;align-items:center;justify-content:center;transition:transform .15s;
+}
+.fab:active{transform:scale(.9)}
+
+/* ---- Modal ---- */
+.modal-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(26,26,46,.55);z-index:100;align-items:flex-end;justify-content:center;
+}
+.modal-overlay.open{display:flex}
+.modal{
+  background:white;border-radius:24px 24px 0 0;padding:20px 20px 40px;
+  width:100%;max-width:480px;max-height:92vh;overflow-y:auto;animation:slideUp .3s ease;
+}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px}
+.modal-title{font-size:18px;font-weight:900;margin-bottom:18px}
+
+/* ---- Method toggle ---- */
+.method-toggle{display:flex;gap:8px;margin-bottom:18px}
+.method-btn{
+  flex:1;padding:10px 8px;border-radius:10px;border:2px solid var(--border);
+  background:white;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;text-align:center;transition:all .2s;
+}
+.method-btn.active{border-color:var(--primary);background:var(--primary);color:white}
+
+/* ---- Folder chips ---- */
+.folder-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:14px}
+.folder-chip{
+  padding:9px 4px;border-radius:10px;border:2px solid var(--border);
+  background:white;font-size:12px;font-weight:700;font-family:inherit;
+  cursor:pointer;text-align:center;transition:all .15s;
+}
+.folder-chip.selected{border-color:var(--primary);background:var(--primary);color:white}
+
+/* ---- Upload area ---- */
+.upload-area{
+  border:2px dashed var(--border);border-radius:16px;
+  padding:28px 16px;text-align:center;cursor:pointer;
+  transition:border-color .2s;margin-bottom:14px;
+}
+.upload-area:hover{border-color:var(--primary)}
+.upload-area .u-icon{font-size:32px;margin-bottom:6px}
+.upload-area p{font-size:13px;color:var(--mid)}
+.upload-area img{max-width:100%;border-radius:8px;max-height:200px;object-fit:contain}
+
+/* ---- Detail ---- */
+.detail-actions{display:flex;gap:8px;margin-top:20px}
+
+/* ---- Toast ---- */
+.toast{
+  position:fixed;top:20px;left:50%;
+  transform:translateX(-50%) translateY(-80px);
+  background:var(--text);color:white;padding:10px 20px;
+  border-radius:50px;font-size:13px;font-weight:700;
+  z-index:200;transition:transform .3s;white-space:nowrap;
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ---- Loading ---- */
+.loading-overlay{
+  position:fixed;inset:0;background:rgba(255,255,255,.75);
+  align-items:center;justify-content:center;z-index:300;display:none;
+}
+.loading-overlay.show{display:flex}
+.spinner{
+  width:36px;height:36px;border:4px solid var(--border);
+  border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="lo"><div class="spinner"></div></div>
+<div class="toast" id="toast"></div>
+
+<!-- ========== SETUP ========== -->
+<div class="view active" id="setupView">
+  <div class="setup-wrap">
+    <div class="setup-logo">✋</div>
+    <div class="setup-title">タスカル！</div>
+    <p class="setup-sub">APIキーを設定してスタートしましょう。<br>設定はこのデバイスにのみ保存されます。</p>
+
+    <div class="form-group">
+      <label class="form-label">Gemini API キー</label>
+      <input type="text" class="form-input" id="geminiKey" placeholder="AIzaSy..." autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Firebase 設定 (JSON)</label>
+      <textarea class="form-input" id="fbConfig" rows="4"
+        placeholder='{"apiKey":"...","authDomain":"...","projectId":"...","storageBucket":"...","messagingSenderId":"...","appId":"..."}'></textarea>
+    </div>
+
+    <button class="btn-primary" onclick="saveSetup()">はじめる →</button>
+
+    <p class="setup-hint">
+      Gemini API → <a href="https://aistudio.google.com" target="_blank">Google AI Studio</a> で無料取得<br>
+      Firebase → <a href="https://console.firebase.google.com" target="_blank">Firebase Console</a> でプロジェクト作成後に取得<br>
+      <a href="#" onclick="openDemoMode(); return false;">← まずデモで試す（データは保存されません）</a>
+    </p>
+  </div>
+</div>
+
+<!-- ========== MAIN APP ========== -->
+<div class="view" id="appView">
+  <div class="app-header">
+    <div class="app-logo">✋ タスカル！</div>
+    <button class="btn-icon" onclick="showSettings()" title="設定">⚙️</button>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" onclick="filterFolder('all',this)">すべて</button>
+    <button class="tab" onclick="filterFolder('仕事',this)">💼 仕事</button>
+    <button class="tab" onclick="filterFolder('個人',this)">🏠 個人</button>
+    <button class="tab" onclick="filterFolder('勉強',this)">📚 勉強</button>
+    <button class="tab" onclick="filterFolder('その他',this)">📌 その他</button>
+  </div>
+
+  <div class="task-list" id="taskList">
+    <div class="empty"><div class="icon">📋</div><p>タスクがありません<br>＋から追加しましょう</p></div>
+  </div>
+
+  <div class="fab-wrap">
+    <button class="fab" onclick="openAddModal()">＋</button>
+  </div>
+</div>
+
+<!-- ========== DETAIL ========== -->
+<div class="view" id="detailView">
+  <div class="app-header">
+    <button class="btn-icon" onclick="showView('appView')" style="font-size:22px">←</button>
+    <div class="app-logo">✋ タスカル！</div>
+    <div style="width:34px"></div>
+  </div>
+  <div style="padding:0 20px 60px" id="detailContent"></div>
+</div>
+
+<!-- ========== ADD MODAL ========== -->
+<div class="modal-overlay" id="addModal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">タスクを追加</div>
+
+    <div class="method-toggle">
+      <button class="method-btn active" id="mBtnManual" onclick="setMethod('manual')">✏️ 手入力</button>
+      <button class="method-btn" id="mBtnShot" onclick="setMethod('screenshot')">📷 スクショ解析</button>
+    </div>
+
+    <!-- Manual -->
+    <div id="manualForm">
+      <div class="form-group">
+        <label class="form-label">タスク名 *</label>
+        <input type="text" class="form-input" id="taskTitle" placeholder="例：クライアントA 資料提出">
+      </div>
+      <div class="form-group">
+        <label class="form-label">フォルダ</label>
+        <div class="folder-grid">
+          <button class="folder-chip selected" id="fc仕事" onclick="selFolder('仕事')">💼<br>仕事</button>
+          <button class="folder-chip" id="fc個人" onclick="selFolder('個人')">🏠<br>個人</button>
+          <button class="folder-chip" id="fc勉強" onclick="selFolder('勉強')">📚<br>勉強</button>
+          <button class="folder-chip" id="fcその他" onclick="selFolder('その他')">📌<br>その他</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">締切日</label>
+        <input type="date" class="form-input" id="taskDl">
+      </div>
+      <div class="form-group">
+        <label class="form-label">メモ（任意）</label>
+        <textarea class="form-input" id="taskNote" placeholder="詳細メモ"></textarea>
+      </div>
+      <button class="btn-primary" onclick="saveTask()">追加する</button>
+    </div>
+
+    <!-- Screenshot -->
+    <div id="shotForm" style="display:none">
+      <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+        <div class="u-icon">📷</div>
+        <p>タップしてスクショを選択</p>
+      </div>
+      <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFile(event)">
+
+      <div id="aiResult" style="display:none">
+        <div class="form-group">
+          <label class="form-label">タスク名（編集可）</label>
+          <input type="text" class="form-input" id="aiTitle">
+        </div>
+        <div class="form-group">
+          <label class="form-label">フォルダ（編集可）</label>
+          <div class="folder-grid">
+            <button class="folder-chip" id="afc仕事" onclick="selAiFolder('仕事')">💼<br>仕事</button>
+            <button class="folder-chip" id="afc個人" onclick="selAiFolder('個人')">🏠<br>個人</button>
+            <button class="folder-chip" id="afc勉強" onclick="selAiFolder('勉強')">📚<br>勉強</button>
+            <button class="folder-chip selected" id="afcその他" onclick="selAiFolder('その他')">📌<br>その他</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">締切日（編集可）</label>
+          <input type="date" class="form-input" id="aiDl">
+        </div>
+        <div class="form-group">
+          <label class="form-label">AIのメモ</label>
+          <textarea class="form-input" id="aiNote" rows="3"></textarea>
+        </div>
+        <button class="btn-primary" onclick="saveAiTask()">このタスクを追加</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp }        from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+// ── state ──
+let db = null, unsub = null;
+let tasks = [];
+let curFolder = 'all';
+let selFolderVal = '仕事';
+let selAiFolderVal = 'その他';
+let isDemo = false;
+let demoTasks = [];
+let curTaskId = null;
+
+// ── boot ──
+window.addEventListener('load', async () => {
+  const cfg = loadConfig();
+  if (cfg) { await boot(cfg); showView('appView'); }
+});
+
+function loadConfig() {
+  const gk = localStorage.getItem('geminiKey');
+  const fb = localStorage.getItem('fbConfig');
+  if (!gk || !fb) return null;
+  try { return { geminiKey: gk, fbConfig: JSON.parse(fb) }; } catch { return null; }
+}
+
+async function boot(cfg) {
+  try {
+    const app = initializeApp(cfg.fbConfig);
+    db = getFirestore(app);
+    subscribeFirestore();
+  } catch(e) { showToast('Firebase接続エラー: ' + e.message); }
+}
+
+function subscribeFirestore() {
+  if (unsub) unsub();
+  const q = query(collection(db, 'tasks'), orderBy('createdAt', 'desc'));
+  unsub = onSnapshot(q, snap => {
+    tasks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    render();
+  });
+}
+
+// ── setup ──
+window.saveSetup = async function() {
+  const gk  = document.getElementById('geminiKey').value.trim();
+  const raw  = document.getElementById('fbConfig').value.trim();
+  if (!gk)  { showToast('Gemini APIキーを入力してください'); return; }
+  let fb;
+  try { fb = JSON.parse(raw); } catch { showToast('Firebase JSONが正しくありません'); return; }
+  localStorage.setItem('geminiKey', gk);
+  localStorage.setItem('fbConfig', JSON.stringify(fb));
+  setLoading(true);
+  await boot({ geminiKey: gk, fbConfig: fb });
+  setLoading(false);
+  showView('appView');
+  showToast('設定完了！');
+};
+
+window.openDemoMode = function() {
+  isDemo = true;
+  demoTasks = [
+    { id: 'd1', title: 'クライアントA 提案書作成', folder: '仕事', deadline: getFutureDate(3), note: '来週月曜のMTG用', status: '未完了', createdAt: new Date().toISOString() },
+    { id: 'd2', title: '確定申告の書類整理', folder: '仕事', deadline: getFutureDate(10), note: null, status: '未完了', createdAt: new Date().toISOString() },
+    { id: 'd3', title: '読書：「良い戦略、悪い戦略」', folder: '勉強', deadline: null, note: null, status: '未完了', createdAt: new Date().toISOString() },
+    { id: 'd4', title: 'ジム行く', folder: '個人', deadline: getFutureDate(1), note: null, status: '完了', createdAt: new Date().toISOString() },
+  ];
+  tasks = demoTasks;
+  showView('appView');
+  render();
+  showToast('デモモードです（保存されません）');
+};
+
+function getFutureDate(days) {
+  const d = new Date(); d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0,10);
+}
+
+window.showSettings = function() {
+  if (isDemo) {
+    if (confirm('デモを終了して設定画面へ戻りますか？')) { isDemo = false; showView('setupView'); }
+  } else {
+    if (confirm('設定をリセットしますか？')) { localStorage.clear(); location.reload(); }
+  }
+};
+
+// ── views ──
+window.showView = function(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+};
+
+// ── filter ──
+window.filterFolder = function(folder, btn) {
+  curFolder = folder;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+};
+
+// ── render ──
+function render() {
+  const list = document.getElementById('taskList');
+  const src = isDemo ? demoTasks : tasks;
+  const filtered = curFolder === 'all' ? src : src.filter(t => t.folder === curFolder);
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty"><div class="icon">📋</div><p>タスクがありません<br>＋から追加しましょう</p></div>';
+    return;
+  }
+  list.innerHTML = filtered.map(t => {
+    const dl = dlInfo(t.deadline);
+    return `
+      <div class="task-card ${t.status==='完了'?'done':''}" onclick="openDetail('${t.id}')">
+        <div class="task-row">
+          <div class="task-check ${t.status==='完了'?'done':''}"
+               onclick="event.stopPropagation();toggleTask('${t.id}')">
+            ${t.status==='完了'?'✓':''}
+          </div>
+          <div class="task-title">${esc(t.title)}</div>
+        </div>
+        <div class="task-meta">
+          <span class="task-folder">${esc(t.folder||'その他')}</span>
+          ${t.deadline?`<span class="task-dl ${dl.cls}">${dl.txt}</span>`:''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function dlInfo(dl) {
+  if (!dl) return {txt:'',cls:''};
+  const days = Math.ceil((new Date(dl) - new Date()) / 86400000);
+  if (days < 0)  return {txt:`${Math.abs(days)}日超過`, cls:'urgent'};
+  if (days === 0) return {txt:'今日が締切！', cls:'urgent'};
+  if (days <= 3) return {txt:`締切まであと${days}日`, cls:'soon'};
+  return {txt:`締切 ${dl}`, cls:''};
+}
+
+// ── add modal ──
+window.openAddModal = function() {
+  if (isDemo && !localStorage.getItem('geminiKey')) {
+    showToast('デモモードではGemini解析は使えません');
+  }
+  document.getElementById('taskTitle').value = '';
+  document.getElementById('taskDl').value = '';
+  document.getElementById('taskNote').value = '';
+  selFolder('仕事');
+  setMethod('manual');
+  document.getElementById('addModal').classList.add('open');
+};
+
+window.closeModalOutside = function(e) {
+  if (e.target.id === 'addModal') {
+    document.getElementById('addModal').classList.remove('open');
+    resetShotForm();
+  }
+};
+
+window.setMethod = function(m) {
+  document.getElementById('mBtnManual').classList.toggle('active', m==='manual');
+  document.getElementById('mBtnShot').classList.toggle('active', m==='screenshot');
+  document.getElementById('manualForm').style.display  = m==='manual'     ? 'block' : 'none';
+  document.getElementById('shotForm').style.display    = m==='screenshot' ? 'block' : 'none';
+};
+
+window.selFolder = function(f) {
+  selFolderVal = f;
+  ['仕事','個人','勉強','その他'].forEach(x =>
+    document.getElementById('fc'+x).classList.toggle('selected', x===f)
+  );
+};
+
+window.selAiFolder = function(f) {
+  selAiFolderVal = f;
+  ['仕事','個人','勉強','その他'].forEach(x =>
+    document.getElementById('afc'+x).classList.toggle('selected', x===f)
+  );
+};
+
+// ── save manual ──
+window.saveTask = async function() {
+  const title = document.getElementById('taskTitle').value.trim();
+  if (!title) { showToast('タスク名を入力してください'); return; }
+  const data = {
+    title, folder: selFolderVal,
+    deadline: document.getElementById('taskDl').value || null,
+    note: document.getElementById('taskNote').value.trim() || null,
+    status: '未完了', createdAt: new Date().toISOString()
+  };
+  if (isDemo) {
+    data.id = 'd' + Date.now();
+    demoTasks.unshift(data); tasks = demoTasks; render();
+    document.getElementById('addModal').classList.remove('open');
+    showToast('追加しました（デモ）');
+    return;
+  }
+  setLoading(true);
+  try {
+    await addDoc(collection(db, 'tasks'), data);
+    document.getElementById('addModal').classList.remove('open');
+    showToast('タスクを追加しました');
+  } catch(e) { showToast('エラー: '+e.message); }
+  setLoading(false);
+};
+
+// ── screenshot / Gemini ──
+window.handleFile = async function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    document.getElementById('uploadArea').innerHTML = `<img src="${ev.target.result}" alt="preview">`;
+  };
+  reader.readAsDataURL(file);
+
+  document.getElementById('aiResult').style.display = 'none';
+  setLoading(true);
+  try {
+    const b64 = await toBase64(file);
+    const res = await callGemini(b64, file.type);
+    document.getElementById('aiTitle').value = res.title || '';
+    document.getElementById('aiDl').value    = res.deadline || '';
+    document.getElementById('aiNote').value  = res.description || '';
+    selAiFolder(res.folder || 'その他');
+    document.getElementById('aiResult').style.display = 'block';
+    showToast('Geminiが解析しました！');
+  } catch(e) { showToast('解析エラー: '+e.message); }
+  setLoading(false);
+};
+
+async function callGemini(b64, mime) {
+  const key = localStorage.getItem('geminiKey');
+  if (!key) throw new Error('Gemini APIキーが未設定です');
+  const prompt = `このスクリーンショットを解析してタスクを1件抽出し、必ず以下のJSONのみで返してください（説明文不要）：
+{"title":"タスク名（簡潔に）","description":"詳細や背景","deadline":"YYYY-MM-DD（なければnull）","folder":"仕事・個人・勉強・その他のいずれか"}`;
+  const r = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
+    {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ contents:[{ parts:[
+        { inline_data:{ mime_type:mime, data:b64 } },
+        { text: prompt }
+      ]}]})
+    }
+  );
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.error?.message||'Gemini APIエラー');
+  const txt = d.candidates[0].content.parts[0].text;
+  const m = txt.match(/\{[\s\S]*\}/);
+  if (!m) throw new Error('JSONの解析失敗');
+  return JSON.parse(m[0]);
+}
+
+window.saveAiTask = async function() {
+  const title = document.getElementById('aiTitle').value.trim();
+  if (!title) { showToast('タスク名を確認してください'); return; }
+  const data = {
+    title, folder: selAiFolderVal,
+    deadline: document.getElementById('aiDl').value || null,
+    note: document.getElementById('aiNote').value || null,
+    status: '未完了', source: 'screenshot', createdAt: new Date().toISOString()
+  };
+  if (isDemo) {
+    data.id = 'd'+Date.now(); demoTasks.unshift(data); tasks=demoTasks; render();
+    document.getElementById('addModal').classList.remove('open'); resetShotForm();
+    showToast('追加しました（デモ）'); return;
+  }
+  setLoading(true);
+  try {
+    await addDoc(collection(db, 'tasks'), data);
+    document.getElementById('addModal').classList.remove('open'); resetShotForm();
+    showToast('スクショからタスクを追加しました！');
+  } catch(e) { showToast('エラー: '+e.message); }
+  setLoading(false);
+};
+
+function resetShotForm() {
+  document.getElementById('uploadArea').innerHTML = '<div class="u-icon">📷</div><p>タップしてスクショを選択</p>';
+  document.getElementById('fileInput').value = '';
+  document.getElementById('aiResult').style.display = 'none';
+}
+
+// ── task ops ──
+window.toggleTask = async function(id) {
+  if (isDemo) {
+    const t = demoTasks.find(x=>x.id===id);
+    if (t) { t.status = t.status==='完了'?'未完了':'完了'; tasks=demoTasks; render(); } return;
+  }
+  const t = tasks.find(x=>x.id===id);
+  if (!t) return;
+  await updateDoc(doc(db,'tasks',id), { status: t.status==='完了'?'未完了':'完了' });
+};
+
+window.openDetail = function(id) {
+  const src = isDemo ? demoTasks : tasks;
+  const t = src.find(x=>x.id===id);
+  if (!t) return;
+  curTaskId = id;
+  const dl = dlInfo(t.deadline);
+  document.getElementById('detailContent').innerHTML = `
+    <h2 style="font-size:20px;font-weight:900;margin:0 0 14px">${esc(t.title)}</h2>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px">
+      <span class="task-folder">${esc(t.folder||'その他')}</span>
+      ${t.deadline?`<span class="task-dl ${dl.cls}">${dl.txt} (${t.deadline})</span>`:''}
+      <span style="font-size:11px;padding:2px 9px;border-radius:50px;background:${t.status==='完了'?'#D1FAE5':'#FEF3C7'};color:${t.status==='完了'?'#065F46':'#92400E'};font-weight:700">${t.status}</span>
+    </div>
+    ${t.note?`<div style="background:var(--bg);border-radius:12px;padding:14px;font-size:13px;line-height:1.8;color:var(--mid);margin-bottom:18px">${esc(t.note)}</div>`:''}
+    <div class="detail-actions">
+      <button class="btn-secondary" style="flex:1" onclick="toggleTask('${id}');showView('appView')">
+        ${t.status==='完了'?'↩ 未完了に戻す':'✓ 完了にする'}
+      </button>
+      <button class="btn-danger" onclick="deleteTask('${id}')">🗑️</button>
+    </div>`;
+  showView('detailView');
+};
+
+window.deleteTask = async function(id) {
+  if (!confirm('このタスクを削除しますか？')) return;
+  if (isDemo) {
+    demoTasks = demoTasks.filter(t=>t.id!==id); tasks=demoTasks; render();
+    showView('appView'); showToast('削除しました'); return;
+  }
+  setLoading(true);
+  await deleteDoc(doc(db,'tasks',id));
+  setLoading(false);
+  showView('appView');
+  showToast('削除しました');
+};
+
+// ── utils ──
+function toBase64(file) {
+  return new Promise((res,rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+function esc(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+window.showToast = function(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+};
+function setLoading(on) {
+  document.getElementById('lo').classList.toggle('show', on);
+}
+</script>
+</body>
+</html>
