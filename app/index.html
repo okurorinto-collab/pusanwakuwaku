@@ -163,6 +163,22 @@ textarea.form-input{min-height:72px;resize:vertical}
 }
 .folder-chip.selected{border-color:var(--primary);background:var(--primary);color:white}
 
+/* ---- Deadline type ---- */
+.dl-type-row{display:flex;gap:8px;margin-bottom:10px}
+.dl-chip{
+  flex:1;padding:10px 8px;border-radius:10px;border:2px solid var(--border);
+  background:white;font-size:13px;font-weight:700;font-family:inherit;
+  cursor:pointer;text-align:center;transition:all .15s;
+}
+.dl-chip.selected{border-color:var(--primary);background:var(--primary);color:white}
+.dl-sub{display:flex;gap:8px;margin-bottom:10px}
+.dl-sub-chip{
+  flex:1;padding:8px;border-radius:10px;border:2px solid var(--border);
+  background:white;font-size:12px;font-weight:700;font-family:inherit;
+  cursor:pointer;text-align:center;transition:all .15s;
+}
+.dl-sub-chip.selected{border-color:var(--primary);background:var(--primary);color:white}
+
 /* ---- Upload area ---- */
 .upload-area{
   border:2px dashed var(--border);border-radius:16px;
@@ -293,8 +309,20 @@ textarea.form-input{min-height:72px;resize:vertical}
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label">締切日</label>
-        <input type="date" class="form-input" id="taskDl">
+        <label class="form-label">いつやる？</label>
+        <div class="dl-type-row">
+          <button class="dl-chip selected" id="dlItsuka" onclick="setDlType('itsuka')">🌙 いつか</button>
+          <button class="dl-chip" id="dlSonouchi" onclick="setDlType('sonouchi')">📅 そのうち</button>
+        </div>
+        <div id="dlSonouchiOpts" style="display:none">
+          <div class="dl-sub">
+            <button class="dl-sub-chip selected" id="dlNoDate" onclick="setDlHasDate(false)">締切なし</button>
+            <button class="dl-sub-chip" id="dlHasDate" onclick="setDlHasDate(true)">締切あり 🔔</button>
+          </div>
+          <div id="dlDateWrap" style="display:none">
+            <input type="date" class="form-input" id="taskDl">
+          </div>
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label">メモ（任意）</label>
@@ -326,8 +354,20 @@ textarea.form-input{min-height:72px;resize:vertical}
           </div>
         </div>
         <div class="form-group">
-          <label class="form-label">締切日（編集可）</label>
-          <input type="date" class="form-input" id="aiDl">
+          <label class="form-label">いつやる？（編集可）</label>
+          <div class="dl-type-row">
+            <button class="dl-chip selected" id="aiDlItsuka" onclick="setAiDlType('itsuka')">🌙 いつか</button>
+            <button class="dl-chip" id="aiDlSonouchi" onclick="setAiDlType('sonouchi')">📅 そのうち</button>
+          </div>
+          <div id="aiDlSonouchiOpts" style="display:none">
+            <div class="dl-sub">
+              <button class="dl-sub-chip selected" id="aiDlNoDate" onclick="setAiDlHasDate(false)">締切なし</button>
+              <button class="dl-sub-chip" id="aiDlHasDate" onclick="setAiDlHasDate(true)">締切あり 🔔</button>
+            </div>
+            <div id="aiDlDateWrap" style="display:none">
+              <input type="date" class="form-input" id="aiDl">
+            </div>
+          </div>
         </div>
         <div class="form-group">
           <label class="form-label">AIのメモ</label>
@@ -350,6 +390,8 @@ let tasks = [];
 let curFolder = 'all';
 let selFolderVal = '仕事';
 let selAiFolderVal = 'その他';
+let dlType = 'itsuka', dlHasDate = false;
+let aiDlType = 'itsuka', aiDlHasDate = false;
 let isDemo = false;
 let demoTasks = [];
 let curTaskId = null;
@@ -403,10 +445,11 @@ window.saveSetup = async function() {
 window.openDemoMode = function() {
   isDemo = true;
   demoTasks = [
-    { id: 'd1', title: 'クライアントA 提案書作成', folder: '仕事', deadline: getFutureDate(3), note: '来週月曜のMTG用', status: '未完了', createdAt: new Date().toISOString() },
-    { id: 'd2', title: '確定申告の書類整理', folder: '仕事', deadline: getFutureDate(10), note: null, status: '未完了', createdAt: new Date().toISOString() },
-    { id: 'd3', title: '読書：「良い戦略、悪い戦略」', folder: '勉強', deadline: null, note: null, status: '未完了', createdAt: new Date().toISOString() },
-    { id: 'd4', title: 'ジム行く', folder: '個人', deadline: getFutureDate(1), note: null, status: '完了', createdAt: new Date().toISOString() },
+    { id: 'd1', title: 'クライアントA 提案書作成', folder: '仕事', deadlineType: 'sonouchi', hasDate: true,  deadline: getFutureDate(3),  note: '来週月曜のMTG用', status: '未完了', createdAt: new Date().toISOString() },
+    { id: 'd2', title: '確定申告の書類整理',       folder: '仕事', deadlineType: 'sonouchi', hasDate: false, deadline: null,              note: null, status: '未完了', createdAt: new Date().toISOString() },
+    { id: 'd3', title: '読書：「良い戦略、悪い戦略」', folder: '勉強', deadlineType: 'itsuka',   hasDate: false, deadline: null,              note: null, status: '未完了', createdAt: new Date().toISOString() },
+    { id: 'd4', title: 'ポートフォリオ更新',       folder: '仕事', deadlineType: 'sonouchi', hasDate: true,  deadline: getFutureDate(1),  note: null, status: '未完了', createdAt: new Date().toISOString() },
+    { id: 'd5', title: 'ジム行く',                 folder: '個人', deadlineType: 'itsuka',   hasDate: false, deadline: null,              note: null, status: '完了',   createdAt: new Date().toISOString() },
   ];
   tasks = demoTasks;
   showView('appView');
@@ -451,7 +494,7 @@ function render() {
     return;
   }
   list.innerHTML = filtered.map(t => {
-    const dl = dlInfo(t.deadline);
+    const dl = dlInfo(t);
     return `
       <div class="task-card ${t.status==='完了'?'done':''}" onclick="openDetail('${t.id}')">
         <div class="task-row">
@@ -463,32 +506,69 @@ function render() {
         </div>
         <div class="task-meta">
           <span class="task-folder">${esc(t.folder||'その他')}</span>
-          ${t.deadline?`<span class="task-dl ${dl.cls}">${dl.txt}</span>`:''}
+          <span class="task-dl ${dl.cls}">${dl.txt}</span>
         </div>
       </div>`;
   }).join('');
 }
 
-function dlInfo(dl) {
-  if (!dl) return {txt:'',cls:''};
+function dlInfo(t) {
+  // 旧データ互換: deadlineTypeがない場合は deadline有無で判定
+  const type = t.deadlineType || (t.deadline ? 'sonouchi' : 'itsuka');
+  const hasD  = t.hasDate !== undefined ? t.hasDate : !!t.deadline;
+
+  if (type === 'itsuka') return {txt:'🌙 いつか', cls:''};
+  if (!hasD)             return {txt:'📅 そのうち', cls:''};
+
+  const dl = t.deadline;
+  if (!dl) return {txt:'📅 そのうち', cls:''};
   const days = Math.ceil((new Date(dl) - new Date()) / 86400000);
-  if (days < 0)  return {txt:`${Math.abs(days)}日超過`, cls:'urgent'};
-  if (days === 0) return {txt:'今日が締切！', cls:'urgent'};
-  if (days <= 3) return {txt:`締切まであと${days}日`, cls:'soon'};
-  return {txt:`締切 ${dl}`, cls:''};
+  if (days < 0)  return {txt:`📅 ${Math.abs(days)}日超過`, cls:'urgent'};
+  if (days === 0) return {txt:'📅 今日が締切！', cls:'urgent'};
+  if (days <= 3) return {txt:`📅 あと${days}日`, cls:'soon'};
+  const [,m,d2] = dl.split('-');
+  return {txt:`📅 そのうち · ${parseInt(m)}/${parseInt(d2)}`, cls:''};
 }
 
 // ── add modal ──
 window.openAddModal = function() {
-  if (isDemo && !localStorage.getItem('geminiKey')) {
-    showToast('デモモードではGemini解析は使えません');
-  }
   document.getElementById('taskTitle').value = '';
-  document.getElementById('taskDl').value = '';
   document.getElementById('taskNote').value = '';
   selFolder('仕事');
+  setDlType('itsuka');
   setMethod('manual');
   document.getElementById('addModal').classList.add('open');
+};
+
+window.setDlType = function(type) {
+  dlType = type;
+  document.getElementById('dlItsuka').classList.toggle('selected', type==='itsuka');
+  document.getElementById('dlSonouchi').classList.toggle('selected', type==='sonouchi');
+  document.getElementById('dlSonouchiOpts').style.display = type==='sonouchi' ? 'block' : 'none';
+  if (type === 'itsuka') { dlHasDate = false; }
+};
+
+window.setDlHasDate = function(has) {
+  dlHasDate = has;
+  document.getElementById('dlNoDate').classList.toggle('selected', !has);
+  document.getElementById('dlHasDate').classList.toggle('selected', has);
+  document.getElementById('dlDateWrap').style.display = has ? 'block' : 'none';
+  if (has) document.getElementById('taskDl').value = '';
+};
+
+window.setAiDlType = function(type) {
+  aiDlType = type;
+  document.getElementById('aiDlItsuka').classList.toggle('selected', type==='itsuka');
+  document.getElementById('aiDlSonouchi').classList.toggle('selected', type==='sonouchi');
+  document.getElementById('aiDlSonouchiOpts').style.display = type==='sonouchi' ? 'block' : 'none';
+  if (type === 'itsuka') { aiDlHasDate = false; }
+};
+
+window.setAiDlHasDate = function(has) {
+  aiDlHasDate = has;
+  document.getElementById('aiDlNoDate').classList.toggle('selected', !has);
+  document.getElementById('aiDlHasDate').classList.toggle('selected', has);
+  document.getElementById('aiDlDateWrap').style.display = has ? 'block' : 'none';
 };
 
 window.closeModalOutside = function(e) {
@@ -523,9 +603,12 @@ window.selAiFolder = function(f) {
 window.saveTask = async function() {
   const title = document.getElementById('taskTitle').value.trim();
   if (!title) { showToast('タスク名を入力してください'); return; }
+  const deadline = (dlType === 'sonouchi' && dlHasDate) ? (document.getElementById('taskDl').value || null) : null;
   const data = {
     title, folder: selFolderVal,
-    deadline: document.getElementById('taskDl').value || null,
+    deadlineType: dlType,
+    hasDate: dlType === 'sonouchi' && dlHasDate,
+    deadline,
     note: document.getElementById('taskNote').value.trim() || null,
     status: '未完了', createdAt: new Date().toISOString()
   };
@@ -561,9 +644,13 @@ window.handleFile = async function(e) {
     const b64 = await toBase64(file);
     const res = await callGemini(b64, file.type);
     document.getElementById('aiTitle').value = res.title || '';
-    document.getElementById('aiDl').value    = res.deadline || '';
     document.getElementById('aiNote').value  = res.description || '';
     selAiFolder(res.folder || 'その他');
+    setAiDlType(res.deadlineType || 'itsuka');
+    if ((res.deadlineType || 'itsuka') === 'sonouchi') {
+      setAiDlHasDate(!!res.hasDate);
+      if (res.hasDate && res.deadline) document.getElementById('aiDl').value = res.deadline;
+    }
     document.getElementById('aiResult').style.display = 'block';
     showToast('Geminiが解析しました！');
   } catch(e) { showToast('解析エラー: '+e.message); }
@@ -574,7 +661,8 @@ async function callGemini(b64, mime) {
   const key = localStorage.getItem('geminiKey');
   if (!key) throw new Error('Gemini APIキーが未設定です');
   const prompt = `このスクリーンショットを解析してタスクを1件抽出し、必ず以下のJSONのみで返してください（説明文不要）：
-{"title":"タスク名（簡潔に）","description":"詳細や背景","deadline":"YYYY-MM-DD（なければnull）","folder":"仕事・個人・勉強・その他のいずれか"}`;
+{"title":"タスク名（簡潔に）","description":"詳細や背景","deadlineType":"itsuka（締切なし・いつかやる）またはsonouchi（近いうちにやる）","hasDate":true/false,"deadline":"YYYY-MM-DD（hasDate=trueのときのみ、なければnull）","folder":"仕事・個人・勉強・その他のいずれか"}
+deadlineTypeの判断基準: 明確な期日・締切・提出日が見えればsonouchi+hasDate:true、期日不明でも重要そうならsonouchi+hasDate:false、メモ程度ならitsuka`;
   const r = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
     {
@@ -596,9 +684,12 @@ async function callGemini(b64, mime) {
 window.saveAiTask = async function() {
   const title = document.getElementById('aiTitle').value.trim();
   if (!title) { showToast('タスク名を確認してください'); return; }
+  const deadline = (aiDlType === 'sonouchi' && aiDlHasDate) ? (document.getElementById('aiDl').value || null) : null;
   const data = {
     title, folder: selAiFolderVal,
-    deadline: document.getElementById('aiDl').value || null,
+    deadlineType: aiDlType,
+    hasDate: aiDlType === 'sonouchi' && aiDlHasDate,
+    deadline,
     note: document.getElementById('aiNote').value || null,
     status: '未完了', source: 'screenshot', createdAt: new Date().toISOString()
   };
@@ -638,12 +729,12 @@ window.openDetail = function(id) {
   const t = src.find(x=>x.id===id);
   if (!t) return;
   curTaskId = id;
-  const dl = dlInfo(t.deadline);
+  const dl = dlInfo(t);
   document.getElementById('detailContent').innerHTML = `
     <h2 style="font-size:20px;font-weight:900;margin:0 0 14px">${esc(t.title)}</h2>
     <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px">
       <span class="task-folder">${esc(t.folder||'その他')}</span>
-      ${t.deadline?`<span class="task-dl ${dl.cls}">${dl.txt} (${t.deadline})</span>`:''}
+      <span class="task-dl ${dl.cls}">${dl.txt}${t.deadline&&t.hasDate?' ('+t.deadline+')':''}</span>
       <span style="font-size:11px;padding:2px 9px;border-radius:50px;background:${t.status==='完了'?'#D1FAE5':'#FEF3C7'};color:${t.status==='完了'?'#065F46':'#92400E'};font-weight:700">${t.status}</span>
     </div>
     ${t.note?`<div style="background:var(--bg);border-radius:12px;padding:14px;font-size:13px;line-height:1.8;color:var(--mid);margin-bottom:18px">${esc(t.note)}</div>`:''}

@@ -27,7 +27,7 @@ db = firestore.Client(
     credentials=creds,
 )
 
-# 締切3日前・未完了タスクを検索
+# 締切3日前・未完了・そのうち+締切ありのタスクを検索
 snap = (
     db.collection("tasks")
     .where("status", "==", "未完了")
@@ -37,6 +37,11 @@ snap = (
 targets = []
 for doc in snap:
     data = doc.to_dict()
+    # 旧データ互換: deadlineTypeがなければdeadline有無で判定
+    dl_type  = data.get("deadlineType", "sonouchi" if data.get("deadline") else "itsuka")
+    has_date = data.get("hasDate", bool(data.get("deadline")))
+    if dl_type != "sonouchi" or not has_date:
+        continue
     dl = data.get("deadline")
     if not dl:
         continue
